@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover, user-scalable=no">
+<title>Lo Tengo Todo Boutique - POS</title>
+
+<!-- PWA -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#5A0F2E">
+
+<!-- iOS specific -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Lo Tengo Todo">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152.png">
+<link rel="apple-touch-icon" sizes="167x167" href="icons/icon-167.png">
+<link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
+<link rel="icon" href="icons/icon-32.png">
+
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="splash">
+  <img src="icons/icon-512.png" alt="Lo Tengo Todo">
+  <div class="brand">LO TENGO TODO</div>
+  <div class="tag">Boutique de Moda y Belleza</div>
+</div>
+
+<div id="app">
+
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div>
+      <div class="title" id="topbar-title">Inicio</div>
+      <div class="subtitle" id="topbar-subtitle">Lo Tengo Todo Boutique</div>
+    </div>
+    <img class="logo-mini" src="icons/icon-64.png" alt="logo">
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast"></div>
+
+  <!-- ===================== INICIO (DASHBOARD) ===================== -->
+  <div class="screen" id="screen-inicio">
+    <div class="stat-grid" id="dashboard-stats">
+      <div class="stat-card"><div class="value" id="d-ventas-hoy">RD$0</div><div class="label">VENTAS DE HOY</div></div>
+      <div class="stat-card"><div class="value" id="d-ganancia-hoy">RD$0</div><div class="label">GANANCIA DE HOY</div></div>
+      <div class="stat-card full"><div class="value" id="d-total-productos">0</div><div class="label">PRODUCTOS EN INVENTARIO</div></div>
+    </div>
+
+    <div id="low-stock-alert"></div>
+
+    <div class="section-title">💎 Más Vendidos</div>
+    <div class="card" id="top-products-card">
+      <div class="empty-state"><div class="eicon">🛍️</div>Aún no hay ventas registradas</div>
+    </div>
+
+    <div class="section-title">🕘 Últimas Ventas</div>
+    <div class="card" id="recent-sales-card">
+      <div class="empty-state"><div class="eicon">🧾</div>Sin ventas recientes</div>
+    </div>
+  </div>
+
+  <!-- ===================== VENTAS ===================== -->
+  <div class="screen hidden" id="screen-ventas">
+    <div class="category-scroll" id="category-filter"></div>
+    <div class="product-grid" id="sale-product-grid"></div>
+    <div style="height:80px"></div>
+  </div>
+
+  <div class="cart-bar hidden" id="cart-bar">
+    <div>
+      <div class="ctxt" id="cart-count">0 productos</div>
+      <div class="ctotal" id="cart-total">RD$0</div>
+    </div>
+    <button id="btn-open-cart">Ver Carrito 🛒</button>
+  </div>
+
+  <!-- ===================== INVENTARIO ===================== -->
+  <div class="screen hidden" id="screen-inventario">
+    <div class="btn-row">
+      <button class="btn btn-gold" id="btn-add-product">➕ Nuevo Producto</button>
+      <button class="btn btn-primary" id="btn-restock">📥 Entrada de Mercancía</button>
+    </div>
+    <div class="category-scroll" id="inv-category-filter" style="margin-top:14px;"></div>
+    <div class="product-grid" id="inventory-grid"></div>
+  </div>
+
+  <!-- ===================== REPORTES ===================== -->
+  <div class="screen hidden" id="screen-reportes">
+    <div class="stat-grid">
+      <div class="stat-card"><div class="value" id="r-ventas-total">RD$0</div><div class="label">VENTAS TOTALES</div></div>
+      <div class="stat-card"><div class="value" id="r-ganancia-total">RD$0</div><div class="label">GANANCIA TOTAL</div></div>
+    </div>
+    <button class="btn btn-gold" id="btn-download-report-pdf">📄 Descargar PDF del Estado General</button>
+    <div class="section-title" style="margin-top:16px;">🏆 Productos Más Vendidos</div>
+    <div class="card" id="r-top-products"></div>
+    <div class="section-title">📜 Historial de Ventas</div>
+    <div class="card" id="r-history"></div>
+  </div>
+
+  <!-- ===================== CONFIGURACION ===================== -->
+  <div class="screen hidden" id="screen-config">
+    <div class="card">
+      <div class="section-title" style="margin-top:0;">🏬 Datos del Negocio</div>
+      <label>Nombre del negocio</label>
+      <input type="text" id="cfg-business-name" placeholder="Lo Tengo Todo Boutique">
+      <label>Teléfono (WhatsApp) — con código de país</label>
+      <input type="tel" id="cfg-business-phone" placeholder="Ej: 18091234567">
+      <button class="btn btn-primary" id="btn-save-config">Guardar Datos</button>
+    </div>
+
+    <div class="card">
+      <div class="section-title" style="margin-top:0;">💾 Respaldo de Datos</div>
+      <p style="font-size:12px; color:#777; margin:0 0 8px;">Todo se guarda localmente en tu iPhone. Exporta un respaldo periódicamente por seguridad.</p>
+      <div class="btn-row">
+        <button class="btn btn-outline" id="btn-export">⬇️ Exportar</button>
+        <button class="btn btn-outline" id="btn-import">⬆️ Importar</button>
+      </div>
+      <input type="file" id="import-file" accept="application/json" style="display:none;">
+
+      <label style="display:flex; align-items:center; gap:8px; margin-top:14px; font-size:13px; color:#555;">
+        <input type="checkbox" id="cfg-auto-backup" style="width:18px; height:18px;">
+        Guardar copia de seguridad automática una vez al día
+      </label>
+      <p style="font-size:11px; color:#999; margin:6px 0 0;">
+        Tip: en <b>Ajustes de iPhone → Safari → Descargas</b>, elige <b>"iCloud Drive"</b> como carpeta de descarga.
+        Así, tanto esta copia automática como tus exportaciones manuales quedarán guardadas en iCloud, fuera del
+        almacenamiento del navegador — sobreviven aunque borres la app, el ícono, o iOS limpie los datos del sitio.
+      </p>
+    </div>
+
+    <div class="card">
+      <div class="section-title" style="margin-top:0; color:var(--danger);">⚠️ Zona de Riesgo</div>
+
+      <p style="font-size:12px; color:#777; margin:0 0 4px;"><b>Borrar Todos los Datos:</b> elimina productos y ventas, pero conserva el nombre del negocio y el teléfono configurados.</p>
+      <button class="btn btn-danger" id="btn-wipe">🗑️ Borrar Todos los Datos</button>
+
+      <p style="font-size:12px; color:#777; margin:16px 0 4px;"><b>Restablecer Sistema:</b> borra absolutamente todo (productos, ventas, configuración del negocio y caché de la app) y la deja como recién instalada.</p>
+      <button class="btn btn-danger" id="btn-reset-system">🔄 Restablecer Sistema</button>
+    </div>
+
+    <div class="card" style="text-align:center; color:#999; font-size:11px;">
+      Lo Tengo Todo Boutique · POS v1.0<br>Ropa · Accesorios · Pestañas · Lencería
+    </div>
+  </div>
+
+  <!-- TAB BAR -->
+  <div class="tabbar">
+    <div class="tab-item active" data-screen="inicio">
+      <div class="ticon">🏠</div><div class="tlabel">Inicio</div>
+    </div>
+    <div class="tab-item" data-screen="ventas">
+      <div class="ticon">🛒</div><div class="tlabel">Ventas</div>
+    </div>
+    <div class="tab-item" data-screen="inventario">
+      <div class="ticon">📦</div><div class="tlabel">Inventario</div>
+    </div>
+    <div class="tab-item" data-screen="reportes">
+      <div class="ticon">📊</div><div class="tlabel">Reportes</div>
+    </div>
+    <div class="tab-item" data-screen="config">
+      <div class="ticon">⚙️</div><div class="tlabel">Ajustes</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== MODALES ===================== -->
+
+<!-- Modal: Agregar/Editar Producto -->
+<div class="modal-overlay hidden" id="modal-product">
+  <div class="modal-sheet">
+    <div class="modal-header">
+      <h3 id="product-modal-title">Nuevo Producto</h3>
+      <button class="modal-close" data-close="modal-product">✕</button>
+    </div>
+    <input type="hidden" id="p-id">
+    <label>Nombre del producto</label>
+    <input type="text" id="p-name" placeholder="Ej: Zapatos Dorados Elegance">
+    <label>Categoría</label>
+    <select id="p-category">
+      <option value="zapatos">👠 Zapatos</option>
+      <option value="bolsos">👜 Bolsos</option>
+      <option value="pestanas">👁️ Pestañas</option>
+      <option value="vestidos">👗 Vestidos</option>
+      <option value="ropa">👚 Ropa</option>
+      <option value="accesorios">💍 Accesorios</option>
+      <option value="lenceria">🩱 Lencería</option>
+      <option value="otro">✨ Otro</option>
+    </select>
+    <div class="btn-row">
+      <div style="flex:1;">
+        <label>Precio de venta (RD$)</label>
+        <input type="number" id="p-price" placeholder="0.00" inputmode="decimal">
+      </div>
+      <div style="flex:1;">
+        <label>Costo (RD$)</label>
+        <input type="number" id="p-cost" placeholder="0.00" inputmode="decimal">
+      </div>
+    </div>
+    <label>Stock disponible</label>
+    <input type="number" id="p-stock" placeholder="0" inputmode="numeric">
+    <label>Alerta de bajo stock (unidades)</label>
+    <input type="number" id="p-min-stock" placeholder="5" inputmode="numeric" value="5">
+    <button class="btn btn-primary" id="btn-save-product">Guardar Producto</button>
+    <button class="btn btn-outline hidden" id="btn-delete-product">Eliminar Producto</button>
+  </div>
+</div>
+
+<!-- Modal: Carrito / Checkout -->
+<div class="modal-overlay hidden" id="modal-cart">
+  <div class="modal-sheet">
+    <div class="modal-header">
+      <h3>🛒 Carrito de Venta</h3>
+      <button class="modal-close" data-close="modal-cart">✕</button>
+    </div>
+    <div id="cart-lines"></div>
+    <div style="display:flex; justify-content:space-between; padding:14px 0; font-weight:700; font-size:17px; color:var(--wine); border-top:2px solid var(--gold);">
+      <span>Total</span><span id="cart-modal-total">RD$0</span>
+    </div>
+    <label>Nombre del cliente (opcional)</label>
+    <input type="text" id="sale-client-name" placeholder="Cliente">
+    <label>Teléfono del cliente (para WhatsApp)</label>
+    <input type="tel" id="sale-client-phone" placeholder="Ej: 18091234567">
+    <label>Método de Pago</label>
+    <div class="pay-options">
+      <div class="pay-option selected" data-pay="Efectivo">💵 Efectivo</div>
+      <div class="pay-option" data-pay="Transferencia">🏦 Transferencia</div>
+    </div>
+    <button class="btn btn-primary" id="btn-complete-sale">Completar Venta</button>
+  </div>
+</div>
+
+<!-- Modal: Entrada de Mercancía -->
+<div class="modal-overlay hidden" id="modal-restock">
+  <div class="modal-sheet">
+    <div class="modal-header">
+      <h3>📥 Entrada de Mercancía</h3>
+      <button class="modal-close" data-close="modal-restock">✕</button>
+    </div>
+    <label>Producto</label>
+    <select id="rs-product"></select>
+    <div id="rs-current-stock" style="font-size:12px; color:#777; margin-top:4px;"></div>
+    <label>Cantidad que está entrando</label>
+    <input type="number" id="rs-qty" placeholder="0" inputmode="numeric">
+    <label>Nuevo costo unitario (opcional, actualiza el costo del producto)</label>
+    <input type="number" id="rs-cost" placeholder="Déjalo vacío para no cambiarlo" inputmode="decimal">
+    <label>Nota (opcional)</label>
+    <input type="text" id="rs-note" placeholder="Ej: Compra proveedor / Reposición">
+    <button class="btn btn-primary" id="btn-confirm-restock">Registrar Entrada</button>
+  </div>
+</div>
+
+<!-- Modal: Venta completada -->
+<div class="modal-overlay hidden" id="modal-success">
+  <div class="modal-sheet" style="text-align:center;">
+    <div style="font-size:50px; margin:10px 0;">✅</div>
+    <h3 style="margin:0 0 6px;">¡Venta Completada!</h3>
+    <p style="color:#777; font-size:13px; margin:0 0 16px;" id="success-total-text">Total: RD$0</p>
+    <button class="btn btn-gold" id="btn-download-pdf">⬇️ Descargar Factura PDF</button>
+    <button class="btn btn-primary" id="btn-share-whatsapp">📲 Enviar por WhatsApp</button>
+    <button class="btn btn-outline" data-close="modal-success">Cerrar</button>
+  </div>
+</div>
+
+<!-- Modal: Reimprimir factura desde el historial -->
+<div class="modal-overlay hidden" id="modal-reprint">
+  <div class="modal-sheet" style="text-align:center;">
+    <div style="font-size:50px; margin:10px 0;">🧾</div>
+    <h3 style="margin:0 0 6px;">Reimprimir Factura</h3>
+    <p style="color:#777; font-size:13px; margin:0 0 16px;" id="reprint-total-text">Total: RD$0</p>
+    <button class="btn btn-gold" id="btn-reprint-download-pdf">⬇️ Descargar Factura PDF</button>
+    <button class="btn btn-primary" id="btn-reprint-share-whatsapp">📲 Enviar por WhatsApp</button>
+    <button class="btn btn-outline" data-close="modal-reprint">Cerrar</button>
+  </div>
+</div>
+
+<script src="js/pdf-lib.js"></script>
+<script src="js/logo-data.js"></script>
+<script src="js/db.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
